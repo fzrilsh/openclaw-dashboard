@@ -26,7 +26,7 @@ export function TaskCard({ task, onEdit, onDelete, onExecute, isExecuting, colum
 
   return (
     <div
-      className="rounded-xl border p-3 cursor-grab active:cursor-grabbing transition-colors hover:border-blue-500/40"
+      className="rounded-xl border p-3 cursor-pointer transition-colors hover:border-blue-500/40 group"
       style={{ background: "var(--background)", borderColor: "var(--border)" }}
     >
       <div className="flex items-start justify-between gap-2">
