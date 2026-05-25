@@ -396,6 +396,40 @@ export type ConfigEntry = {
   section?: string;
 };
 
+// ─── Tasks ────────────────────────────────────────────────────────────────────
+
+export type TaskInfo = {
+  taskId: string;
+  runtime: "subagent" | "cli" | "acp" | "cron";
+  sourceId?: string;
+  requesterSessionKey?: string;
+  ownerKey?: string;
+  scopeKind?: string;
+  childSessionKey?: string;
+  parentFlowId?: string;
+  agentId?: string;
+  runId?: string;
+  label?: string;
+  task?: string;
+  status: string;
+  deliveryStatus?: string;
+  notifyPolicy?: string;
+  createdAt: number;
+  startedAt?: number;
+  endedAt?: number;
+  lastEventAt?: number;
+  cleanupAfter?: number;
+  terminalSummary?: string;
+  progressSummary?: string;
+};
+
+export type TasksListResult = {
+  count: number;
+  runtime?: string | null;
+  status?: string | null;
+  tasks: TaskInfo[];
+};
+
 // ─── Health ─────────────────────────────────────────────────────────────────
 
 export type HealthStatus = {
