@@ -38,7 +38,7 @@
       "description": "check apakah openclaw dashboard sudah punya page kanban.",
       "acceptanceCriteria": "response apakah openclaw dashboard sudah punya page kanban.",
       "priority": "low",
-      "columnId": "todo",
+      "columnId": "backlog",
       "order": 1,
       "assignee": null,
       "assigneeName": "Main Agent",
@@ -60,12 +60,18 @@
           "type": "updated",
           "message": "Updated: status to todo",
           "timestamp": 1779710949671
+        },
+        {
+          "id": "0408ffa5-facd-4e34-8d24-e5e90f7f89fd",
+          "type": "updated",
+          "message": "Updated: status to backlog",
+          "timestamp": 1779711155542
         }
       ],
       "status": "active",
       "archived": false,
       "createdAt": 1779710943104,
-      "updatedAt": 1779710949671
+      "updatedAt": 1779711155542
     }
   ]
 }

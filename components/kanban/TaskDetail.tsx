@@ -1,7 +1,7 @@
 "use client";
 
 import { KanbanTask } from "@/lib/types";
-import { X, Calendar, Archive, Trash2, Edit2, Clock, Tag } from "lucide-react";
+import { X, Calendar, Archive, Trash2, Edit2, Clock, Tag, CheckCircle2 } from "lucide-react";
 
 interface TaskDetailProps {
   task: KanbanTask;
@@ -106,6 +106,18 @@ export function TaskDetail({ task, onClose, onEdit, onDelete, onArchive }: TaskD
                     {tag}
                   </span>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* Execution Result */}
+          {task.lastResult && (
+            <div>
+              <h3 className="text-xs font-semibold mb-1.5 flex items-center gap-1.5" style={{ color: "var(--text-primary)" }}>
+                <CheckCircle2 className="w-3 h-3" /> Execution Result
+              </h3>
+              <div className="text-xs rounded-lg p-3 whitespace-pre-wrap max-h-60 overflow-y-auto" style={{ background: "var(--background)", color: "var(--text-secondary)", border: "1px solid var(--border)" }}>
+                {task.lastResult}
               </div>
             </div>
           )}

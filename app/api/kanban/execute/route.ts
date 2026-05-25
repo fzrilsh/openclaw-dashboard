@@ -48,12 +48,24 @@ export async function POST(request: Request) {
     prompt += `Priority: ${task.priority}\n`;
     if (task.dueDate) prompt += `Due: ${task.dueDate}\n`;
 
-    // Execute via openclaw CLI
+    // Execute via openclaw agent
     let result;
     try {
-      const cmd = `openclaw tasks create --agent "${task.assigneeName}" --task ${JSON.stringify(prompt)} 2>/dev/null`;
-      const output = execSync(cmd, { encoding: "utf-8", timeout: 10000 });
-      result = { ok: true, output: output.trim() };
+      const cmd = `openclaw agent --agent "${task.assigneeName}" --message ${JSON.stringify(prompt)} --json 2>/dev/null`;
+      const output = execSync(cmd, { encoding: "utf-8", timeout: 120000 });
+      let agentResponse = "";
+      try {
+        const parsed = JSON.parse(output);
+        if (parsed.payloads && parsed.payloads.length > 0) {
+          agentResponse = parsed.payloads.map((p: any) => p.text).filter(Boolean).join("\n");
+        } else if (parsed.text) {
+          agentResponse = parsed.text;
+        }
+      } catch {
+        agentResponse = output.trim();
+      }
+      task.lastResult = agentResponse;
+      result = { ok: true, output: agentResponse.substring(0, 500) };
     } catch (execErr) {
       result = {
         ok: false,
