@@ -430,6 +430,62 @@ export type TasksListResult = {
   tasks: TaskInfo[];
 };
 
+// ─── Kanban ─────────────────────────────────────────────────────────────────
+
+export type KanbanColumn = {
+  id: string;
+  title: string;
+  order: number;
+  wipLimit?: number | null;
+};
+
+export type KanbanPriority = "low" | "medium" | "high" | "urgent";
+
+export type KanbanRecurring = {
+  enabled: boolean;
+  interval: "daily" | "weekly" | "monthly" | "cron";
+  cronExpression?: string;
+};
+
+export type KanbanActivity = {
+  id: string;
+  type: "created" | "status_changed" | "assigned" | "priority_changed" | "commented" | "executed" | "execution_failed";
+  message: string;
+  timestamp: number;
+  userId?: string;
+};
+
+export type KanbanDependency = {
+  taskId: string;
+  title: string;
+};
+
+export type KanbanTask = {
+  id: string;
+  title: string;
+  description: string;
+  acceptanceCriteria?: string;
+  priority: KanbanPriority;
+  status: string;
+  columnId: string;
+  order: number;
+  assignee?: string;
+  assigneeName?: string;
+  tags: string[];
+  dueDate?: string | null;
+  dependencies: KanbanDependency[];
+  recurring?: KanbanRecurring | null;
+  activities: KanbanActivity[];
+  createdAt: number;
+  updatedAt: number;
+  archived: boolean;
+};
+
+export type KanbanBoard = {
+  columns: KanbanColumn[];
+  tasks: KanbanTask[];
+};
+
 // ─── Health ─────────────────────────────────────────────────────────────────
 
 export type HealthStatus = {
