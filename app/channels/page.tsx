@@ -35,6 +35,7 @@ export default function OpenClawChannelsPage() {
   const [error, setError] = useState<string | null>(null);
 
   // QR login state
+  const [channelAccounts, setChannelAccounts] = useState<Record<string, unknown[]>>({});
   const [qrState, setQrState] = useState<QRState>({ step: "idle" });
   const [linkingChannelId, setLinkingChannelId] = useState<string | null>(null);
   const abortRef = useRef(false);
@@ -47,6 +48,7 @@ export default function OpenClawChannelsPage() {
       const result = (await rpc("channels.status")) as any;
       if (result?.channelMeta) setChannelMeta(result.channelMeta);
       if (result?.channels) setChannelDetails(result.channels);
+      if (result?.channelAccounts) setChannelAccounts(result.channelAccounts);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load channels");
     } finally {
@@ -130,16 +132,12 @@ export default function OpenClawChannelsPage() {
     setLinkingChannelId(null);
   };
 
-  const isChannelActive = (detail: ChannelDetail | undefined) => {
-    return !!(
-      detail?.linked ||
-      detail?.configured ||
-      detail?.connected ||
-      detail?.running ||
-      detail?.authAgeMs
-    );
+  const isChannelActive = (id: string, detail: ChannelDetail | undefined) => {
+    if (detail?.linked || detail?.configured || detail?.connected || detail?.running || detail?.authAgeMs) return true;
+    if (channelAccounts[id]?.length > 0) return true;
+    return false;
   };
-  const linkedCount = channelMeta.filter((c) => isChannelActive(channelDetails[c.id])).length;
+  const linkedCount = channelMeta.filter((c) => isChannelActive(c.id, channelDetails[c.id])).length;
   const showQRModal = qrState.step !== "idle" && linkingChannelId;
 
   return (
@@ -206,8 +204,10 @@ export default function OpenClawChannelsPage() {
         <div className="space-y-2">
           {channelMeta.map((ch) => {
             const detail = channelDetails[ch.id];
-            const isLinked = !!(detail?.linked || detail?.connected || detail?.running || detail?.authAgeMs);
-            const isConfigured = !!(detail?.configured);
+            // Fallback: if channelDetails doesn't have this channel by ID, check channelAccounts
+            const resolvedDetail = detail || (channelAccounts[ch.id]?.length > 0 ? { configured: true } : undefined);
+            const isLinked = !!(resolvedDetail?.linked || resolvedDetail?.connected || resolvedDetail?.running || resolvedDetail?.authAgeMs || (channelAccounts[ch.id]?.length > 0));
+            const isConfigured = !!(resolvedDetail?.configured);
             const hasError = !!detail?.lastError;
             const selfNum = detail?.self?.e164;
             const authAge = detail?.authAgeMs ? formatAge(detail.authAgeMs) : null;
@@ -298,7 +298,7 @@ export default function OpenClawChannelsPage() {
                           : "bg-gray-500/10 text-gray-400"
                       }`}
                     >
-                      {isLinked ? "Linked" : isConfigured ? "Configured" : "Not linked"}
+                      {isLinked ? "Linked" : isConfigured ? "Configured" : (channelAccounts[ch.id]?.length > 0 ? "Active" : "Not linked")}
                     </span>
                     {!isLinked && (supportsQR || isConfigured) && (
                       <button
