@@ -230,6 +230,7 @@ export function Board() {
                 onDeleteTask={handleDelete}
                 onExecute={handleExecute}
                 executingId={executingId}
+                columns={columns}
               />
             );
           })}

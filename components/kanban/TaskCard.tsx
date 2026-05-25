@@ -1,7 +1,8 @@
 "use client";
 
 import { KanbanTask } from "@/lib/types";
-import { Calendar, Edit2, Trash2 } from "lucide-react";
+import type { KanbanColumn as KanbanColumnType } from "@/lib/types";
+import { Calendar, Edit2, Trash2, ArrowRight, ArrowLeft } from "lucide-react";
 
 interface TaskCardProps {
   task: KanbanTask;
@@ -9,6 +10,7 @@ interface TaskCardProps {
   onDelete: (e: React.MouseEvent) => void;
   onExecute?: () => void;
   isExecuting?: boolean;
+  columns: KanbanColumnType[];
 }
 
 const PRIORITY_COLORS: Record<string, { bg: string; text: string; label: string }> = {
@@ -18,7 +20,7 @@ const PRIORITY_COLORS: Record<string, { bg: string; text: string; label: string 
   urgent: { bg: "#fecaca", text: "#991b1b", label: "Urg" },
 };
 
-export function TaskCard({ task, onEdit, onDelete, onExecute, isExecuting }: TaskCardProps) {
+export function TaskCard({ task, onEdit, onDelete, onExecute, isExecuting, columns }: TaskCardProps) {
   const pc = PRIORITY_COLORS[task.priority] || PRIORITY_COLORS.medium;
   const isOverdue = task.dueDate && new Date(task.dueDate) < new Date();
 
@@ -37,6 +39,29 @@ export function TaskCard({ task, onEdit, onDelete, onExecute, isExecuting }: Tas
           </h4>
         </div>
         <div className="flex items-center gap-0.5 shrink-0">
+          <div className="flex items-center gap-0.5">
+            {columns.map((col) => {
+              if (col.id === task.columnId) return null;
+              return (
+                <button
+                  key={col.id}
+                  title={"Move to " + col.title}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    fetch("/api/kanban/" + task.id, {
+                      method: "PATCH",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ columnId: col.id }),
+                    }).then(() => window.location.reload()).catch(() => {});
+                  }}
+                  className="p-0.5 rounded hover:bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"
+                  style={{ color: "var(--text-secondary)" }}
+                >
+                  <ArrowRight className="w-3 h-3" />
+                </button>
+              );
+            })}
+          </div>
           <button onClick={onEdit} className="p-0.5 rounded hover:bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: "var(--text-secondary)" }}>
             <Edit2 className="w-3 h-3" />
           </button>
