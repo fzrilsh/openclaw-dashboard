@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { KanbanTask, KanbanColumn } from "@/lib/types";
 import { X } from "lucide-react";
 
@@ -22,8 +22,18 @@ export function TaskForm({ task, columns, allTasks, onSave, onClose }: TaskFormP
   const [tagsInput, setTagsInput] = useState((task?.tags || []).join(", "));
   const [dueDate, setDueDate] = useState(task?.dueDate || "");
   const [recurring, setRecurring] = useState(task?.recurring?.enabled ? "daily" : "");
+  const [agents, setAgents] = useState<{ id: string; name: string }[]>([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/agents")
+      .then((r) => r.json())
+      .then((data) => {
+        if (Array.isArray(data)) setAgents(data);
+      })
+      .catch(() => {});
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -138,13 +148,17 @@ export function TaskForm({ task, columns, allTasks, onSave, onClose }: TaskFormP
 
           <div>
             <label className="block text-xs font-medium mb-1" style={{ color: "var(--text-primary)" }}>Assignee</label>
-            <input
+            <select
               value={assigneeName}
               onChange={(e) => setAssigneeName(e.target.value)}
               className="w-full px-3 py-2 rounded-lg border bg-transparent text-sm outline-none"
               style={{ borderColor: "var(--border)", color: "var(--text-primary)" }}
-              placeholder="Agent name (free text for now)"
-            />
+            >
+              <option value="">Unassigned</option>
+              {agents.map((agent) => (
+                <option key={agent.id} value={agent.name}>{agent.name}</option>
+              ))}
+            </select>
           </div>
 
           <div>
