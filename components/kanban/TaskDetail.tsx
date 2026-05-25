@@ -142,6 +142,33 @@ export function TaskDetail({ task, onClose, onEdit, onDelete, onArchive }: TaskD
           )}
         </div>
 
+        {/* Revision — only for In Review */}
+        {task.columnId === "in_review" && (
+          <div>
+            <h3 className="text-xs font-semibold mb-2" style={{ color: "var(--text-primary)" }}>Need Revision?</h3>
+            <textarea
+              id="revisionInput"
+              className="w-full px-3 py-2 rounded-lg border bg-transparent text-sm outline-none resize-none"
+              style={{ borderColor: "var(--border)", color: "var(--text-primary)" }}
+              rows={3}
+              placeholder="Describe what needs to be changed..."
+            />
+            <button
+              onClick={() => {
+                const notes = (document.getElementById("revisionInput") as HTMLTextAreaElement).value;
+                fetch("/api/kanban/" + task.id, {
+                  method: "PATCH",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ columnId: "todo", revisionNotes: notes || "Revision requested" }),
+                }).then(() => window.location.reload());
+              }}
+              className="mt-2 px-4 py-1.5 rounded-lg text-xs font-medium bg-amber-600 hover:bg-amber-700 text-white"
+            >
+              Send Back to To Do
+            </button>
+          </div>
+        )}
+
         {/* Actions */}
         <div className="flex items-center justify-between px-5 py-3 border-t" style={{ borderColor: "var(--border)" }}>
           <div className="flex items-center gap-1">

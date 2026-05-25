@@ -481,6 +481,7 @@ export type KanbanTask = {
   archived: boolean;
   lastResult?: string;
   lastRunId?: string;
+  revisionNotes?: string;
 };
 
 export type KanbanBoard = {

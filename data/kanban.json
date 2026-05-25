@@ -33,81 +33,58 @@
   ],
   "tasks": [
     {
-      "id": "a2411fd0-f5b5-4911-a117-e8f2bd368195",
-      "title": "Test",
-      "description": "testing only",
-      "acceptanceCriteria": "response my test, just say halo",
+      "id": "a1c98b2c-50f1-41c3-a3c1-8f5966171252",
+      "title": "Mathematics",
+      "description": "Apa derrivative dari x^10",
+      "acceptanceCriteria": "memberikan jawaban derivative dari x^10",
       "priority": "low",
-      "columnId": "todo",
+      "columnId": "done",
       "order": 1,
       "assignee": null,
-      "assigneeName": "Main Agent",
+      "assigneeName": "main",
       "tags": [
-        "Test"
+        "Math"
       ],
-      "dueDate": "2026-05-26",
+      "dueDate": "2026-05-25",
       "dependencies": [],
       "recurring": null,
       "activities": [
         {
-          "id": "8d5b5385-db83-4091-ba62-ef8f811f9bee",
+          "id": "4328c75b-28c8-4091-8a93-5d793c1869cc",
           "type": "created",
-          "message": "Task \"Test\" created",
-          "timestamp": 1779712199882
+          "message": "Task \"Mathematics\" created",
+          "timestamp": 1779714287103
         },
         {
-          "id": "b0395849-2a78-485e-8dfe-ea1e13f5b306",
+          "id": "9febaa69-f6e8-4b1d-bfad-69c10706ed1b",
           "type": "updated",
-          "message": "Updated: status to backlog",
-          "timestamp": 1779712288933
+          "message": "Updated: status to todo",
+          "timestamp": 1779714296756
         },
         {
-          "id": "ca7569d8-2eac-48da-a3a5-566c071ad54a",
+          "id": "1424ed34-5c3e-4968-89ec-4c3ecd7f1364",
           "type": "updated",
           "message": "Updated: status to in_progress",
-          "timestamp": 1779712369164
+          "timestamp": 1779714298771
         },
         {
-          "id": "5098f813-0a97-4ab4-9eea-d062e4a034fb",
-          "type": "updated",
-          "message": "Updated: status to backlog",
-          "timestamp": 1779712371810
+          "id": "4ccd8f28-e772-40fb-aa78-10d345d1217d",
+          "type": "executed",
+          "message": "Executed by agent \"main\"",
+          "timestamp": 1779714308924
         },
         {
-          "id": "d7ab7489-5aad-4f28-a6f1-43c6a0aee451",
+          "id": "09b5fcc5-70be-43bb-8ca9-1c9529d3d831",
           "type": "updated",
-          "message": "Updated: status to todo",
-          "timestamp": 1779712374563
-        },
-        {
-          "id": "84a89d2a-cc22-4d71-b3af-927dc2fa770b",
-          "type": "updated",
-          "message": "Updated: status to backlog",
-          "timestamp": 1779712390363
-        },
-        {
-          "id": "3276aaf7-8233-4bd2-a2eb-428efe776f75",
-          "type": "updated",
-          "message": "Updated: status to todo",
-          "timestamp": 1779712392730
-        },
-        {
-          "id": "53bf7a38-9f25-4b0c-958a-051374eb3b4f",
-          "type": "updated",
-          "message": "Updated: status to backlog",
-          "timestamp": 1779712527104
-        },
-        {
-          "id": "3aba4014-a4b4-4438-9c56-86c4283bf700",
-          "type": "updated",
-          "message": "Updated: status to todo",
-          "timestamp": 1779712530869
+          "message": "Updated: status to done",
+          "timestamp": 1779714326697
         }
       ],
       "status": "active",
       "archived": false,
-      "createdAt": 1779712199882,
-      "updatedAt": 1779712530869
+      "createdAt": 1779714287103,
+      "updatedAt": 1779714326697,
+      "lastResult": "10x⁹"
     }
   ]
 }

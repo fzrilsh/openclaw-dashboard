@@ -156,7 +156,7 @@ export function TaskForm({ task, columns, allTasks, onSave, onClose }: TaskFormP
             >
               <option value="">Unassigned</option>
               {agents.map((agent) => (
-                <option key={agent.id} value={agent.name}>{agent.name}</option>
+                <option key={agent.id} value={agent.id}>{agent.name}</option>
               ))}
             </select>
           </div>
