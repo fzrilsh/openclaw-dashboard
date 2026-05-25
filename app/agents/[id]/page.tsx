@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useOpenClaw } from "@/contexts/OpenClawContext";
 import { useOpenClawAgents } from "@/hooks/use-openclaw-agents";
-import { ArrowLeft, Save, Loader2 } from "lucide-react";
+import { ArrowLeft, Save, Loader2, AlertCircle } from "lucide-react";
 import type { AgentSummary } from "@/lib/types";
 
 export default function EditAgentPage() {
@@ -20,6 +20,7 @@ export default function EditAgentPage() {
   const [emoji, setEmoji] = useState("");
   const [theme, setTheme] = useState("");
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   useEffect(() => {
     if (agent) {
@@ -31,14 +32,15 @@ export default function EditAgentPage() {
 
   const handleSave = async () => {
     setSaving(true);
+    setSaveError(null);
     try {
       await updateAgent({
         id: agentId,
         identity: { name, emoji, theme },
       });
-      router.push("agents");
+      router.push("/agents");
     } catch (err) {
-      console.error("Failed to update agent:", err);
+      setSaveError(err instanceof Error ? err.message : "Failed to update agent");
     } finally {
       setSaving(false);
     }
@@ -64,7 +66,7 @@ export default function EditAgentPage() {
     <div className="p-6 space-y-6 max-w-2xl">
       <div className="flex items-center gap-3">
         <button
-          onClick={() => router.push("agents")}
+          onClick={() => router.push("/agents")}
           className="p-2 rounded-lg hover:bg-white/5 transition-colors"
           style={{ color: "var(--text-secondary)" }}
         >
@@ -76,6 +78,12 @@ export default function EditAgentPage() {
       </div>
 
       <div className="space-y-4">
+        {saveError && (
+          <div className="flex items-center gap-2 px-4 py-3 rounded-lg bg-red-500/10 text-red-500 text-sm">
+            <AlertCircle className="w-4 h-4" />
+            {saveError}
+          </div>
+        )}
         <Field label="Name">
           <input
             type="text"
