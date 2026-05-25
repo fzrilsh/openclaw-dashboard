@@ -21,7 +21,10 @@ export function Board() {
   const [showForm, setShowForm] = useState(false);
   const [editTask, setEditTask] = useState<KanbanTask | null>(null);
   const [selectedTask, setSelectedTask] = useState<KanbanTask | null>(null);
+  const [showArchived, setShowArchived] = useState(false);
+  const [executingId, setExecutingId] = useState<string | null>(null);
   const [filters, setFilters] = useState<FilterState>({ search: "", priority: "", assignee: "", tag: "" });
+  const recurringChecked = useRef(false);
   const dragTaskRef = useRef<KanbanTask | null>(null);
 
   const fetchBoard = useCallback(async () => {
@@ -40,6 +43,14 @@ export function Board() {
   }, []);
 
   useEffect(() => { fetchBoard(); }, [fetchBoard]);
+
+  // Check recurring tasks once on mount
+  useEffect(() => {
+    if (!recurringChecked.current && board) {
+      recurringChecked.current = true;
+      fetch("/api/kanban/recurring", { method: "POST" }).catch(() => {});
+    }
+  }, [board]);
 
   const handleCreate = async (data: any) => {
     const res = await fetch("/api/kanban", {
@@ -67,6 +78,26 @@ export function Board() {
     await fetchBoard();
   };
 
+  const handleExecute = async (taskId: string) => {
+    setExecutingId(taskId);
+    try {
+      const res = await fetch("/api/kanban/execute", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ taskId }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        console.error("Execute failed:", err.error);
+      }
+      await fetchBoard();
+    } catch (err) {
+      console.error("Execute error:", err);
+    } finally {
+      setExecutingId(null);
+    }
+  };
+
   const handleDragStart = (task: KanbanTask) => {
     dragTaskRef.current = task;
   };
@@ -80,7 +111,7 @@ export function Board() {
 
   // Filter tasks
   const filteredTasks = (board?.tasks || []).filter((t) => {
-    if (t.archived) return false;
+    if (t.archived && !showArchived) return false;
     if (filters.search && !t.title.toLowerCase().includes(filters.search.toLowerCase()) && !t.description.toLowerCase().includes(filters.search.toLowerCase())) return false;
     if (filters.priority && t.priority !== filters.priority) return false;
     if (filters.assignee && t.assignee !== filters.assignee) return false;
@@ -159,6 +190,13 @@ export function Board() {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowArchived(!showArchived)}
+            className={`px-2 py-1.5 rounded-lg border text-xs transition-colors ${showArchived ? "bg-blue-600/10 text-blue-400 border-blue-500/30" : "bg-transparent"}`}
+            style={{ color: showArchived ? undefined : "var(--text-secondary)", borderColor: "var(--border)" }}
+          >
+            {showArchived ? "Hide Archived" : "Show Archived"}
+          </button>
           <button onClick={fetchBoard} className="p-1.5 rounded-lg hover:bg-white/5 transition-colors" style={{ color: "var(--text-secondary)" }}>
             <RefreshCw className="w-4 h-4" />
           </button>
@@ -190,6 +228,8 @@ export function Board() {
                 onTaskClick={setSelectedTask}
                 onEditTask={(task) => { setEditTask(task); setShowForm(true); }}
                 onDeleteTask={handleDelete}
+                onExecute={handleExecute}
+                executingId={executingId}
               />
             );
           })}

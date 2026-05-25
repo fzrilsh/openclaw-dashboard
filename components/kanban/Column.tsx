@@ -12,6 +12,8 @@ interface ColumnProps {
   onTaskClick: (task: KanbanTask) => void;
   onEditTask: (task: KanbanTask) => void;
   onDeleteTask: (id: string) => void;
+  onExecute?: (taskId: string) => void;
+  executingId?: string | null;
 }
 
 const COLUMN_COLORS: Record<string, string> = {
@@ -30,6 +32,8 @@ export function KanbanColumn({
   onTaskClick,
   onEditTask,
   onDeleteTask,
+  onExecute,
+  executingId,
 }: ColumnProps) {
   const color = COLUMN_COLORS[column.id] || "#6b7280";
 
@@ -75,6 +79,8 @@ export function KanbanColumn({
                 task={task}
                 onEdit={(e) => { e.stopPropagation(); onEditTask(task); }}
                 onDelete={(e) => { e.stopPropagation(); if (confirm("Delete this task?")) onDeleteTask(task.id); }}
+                onExecute={task.columnId === "in_progress" ? () => onExecute?.(task.id) : undefined}
+                isExecuting={executingId === task.id}
               />
             </div>
           ))

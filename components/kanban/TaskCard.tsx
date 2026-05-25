@@ -7,6 +7,8 @@ interface TaskCardProps {
   task: KanbanTask;
   onEdit: (e: React.MouseEvent) => void;
   onDelete: (e: React.MouseEvent) => void;
+  onExecute?: () => void;
+  isExecuting?: boolean;
 }
 
 const PRIORITY_COLORS: Record<string, { bg: string; text: string; label: string }> = {
@@ -16,7 +18,7 @@ const PRIORITY_COLORS: Record<string, { bg: string; text: string; label: string 
   urgent: { bg: "#fecaca", text: "#991b1b", label: "Urg" },
 };
 
-export function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
+export function TaskCard({ task, onEdit, onDelete, onExecute, isExecuting }: TaskCardProps) {
   const pc = PRIORITY_COLORS[task.priority] || PRIORITY_COLORS.medium;
   const isOverdue = task.dueDate && new Date(task.dueDate) < new Date();
 
@@ -51,6 +53,16 @@ export function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
         >
           {pc.label}
         </span>
+        {onExecute && (
+          <button
+            onClick={(e) => { e.stopPropagation(); onExecute(); }}
+            disabled={isExecuting}
+            className="text-[10px] px-1.5 py-0.5 rounded font-semibold hover:bg-blue-500/20 transition-colors"
+            style={{ background: isExecuting ? "#3b82f620" : "#3b82f610", color: "#3b82f6" }}
+          >
+            {isExecuting ? "Running..." : "Run"}
+          </button>
+        )}
         {task.assigneeName && (
           <span className="text-[10px] px-1.5 py-0.5 rounded font-medium" style={{ background: "var(--card)", color: "var(--text-secondary)" }}>
             {task.assigneeName}
