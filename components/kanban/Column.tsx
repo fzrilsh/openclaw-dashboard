@@ -71,7 +71,7 @@ export function KanbanColumn({
           tasks.map((task) => (
             <div
               key={task.id}
-              draggable
+              draggable={true}
               onDragStart={() => onDragStart(task)}
               onClick={() => onTaskClick(task)}
             >
