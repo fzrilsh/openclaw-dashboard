@@ -500,7 +500,7 @@ export type RPCMethodMap = {
   "config.schema": [void, unknown];
 
   // Logs
-  "logs.tail": [{ lines?: number; filter?: string; cursor?: string; maxBytes?: number } | void, { file?: string; lines: string[]; cursor?: string }];
+  "logs.tail": [{ limit?: number; cursor?: string; maxBytes?: number } | void, { file?: string; lines: string[]; cursor?: string }];
 
   // Talk mode
   "talk.config": [void, unknown];

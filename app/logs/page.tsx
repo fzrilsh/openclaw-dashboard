@@ -47,7 +47,7 @@ export default function OpenClawLogsPage() {
     if (!isConnected) return;
     setLoading(true);
     try {
-      const result = await rpc("logs.tail", { lines: 200 });
+      const result = await rpc("logs.tail", { limit: 200 });
       setLogs(extractLines(result));
     } catch (err) {
       console.error("Failed to load logs:", err);
@@ -67,7 +67,7 @@ export default function OpenClawLogsPage() {
     // Poll for new logs every 3 seconds
     const interval = setInterval(async () => {
       try {
-        const result = await rpc("logs.tail", { lines: 50 });
+        const result = await rpc("logs.tail", { limit: 50 });
         const newLines = extractLines(result);
         if (newLines.length > 0) {
           setLogs((prev) => {
