@@ -20,6 +20,7 @@ export default function OpenClawOverviewPage() {
   const [health, setHealth] = useState<HealthStatus | null>(null);
   const [channelMeta, setChannelMeta] = useState<ChannelMeta[]>([]);
   const [channelDetails, setChannelDetails] = useState<Record<string, ChannelDetail>>({});
+  const [channelAccounts, setChannelAccounts] = useState<Record<string, unknown[]>>({});
   const [agentCount, setAgentCount] = useState(0);
   const [modelCount, setModelCount] = useState(0);
 
@@ -31,6 +32,7 @@ export default function OpenClawOverviewPage() {
       rpc("channels.status").then((r: any) => {
         if (r?.channelMeta) setChannelMeta(r.channelMeta);
         if (r?.channels) setChannelDetails(r.channels);
+        if (r?.channelAccounts) setChannelAccounts(r.channelAccounts);
       }),
       rpc("models.list").then((r: any) => {
         const models = r?.models ?? r;
@@ -171,7 +173,9 @@ export default function OpenClawOverviewPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {channelMeta.map((ch) => {
               const detail = channelDetails[ch.id];
-              const isLinked = detail?.linked ?? false;
+              const resolvedDetail = detail || (channelAccounts[ch.id]?.length > 0 ? { configured: true } : undefined);
+              const isLinked = !!(resolvedDetail?.linked || resolvedDetail?.connected || resolvedDetail?.running || resolvedDetail?.authAgeMs || (channelAccounts[ch.id]?.length > 0));
+              const isConfigured = !!(resolvedDetail?.configured);
               const isConnected = detail?.connected ?? false;
               const selfNum = detail?.self?.e164;
 
@@ -203,7 +207,7 @@ export default function OpenClawOverviewPage() {
                       isLinked ? "bg-green-500/10 text-green-500" : "bg-gray-500/10 text-gray-400"
                     }`}
                   >
-                    {isLinked ? "Linked" : "Not linked"}
+                    {isLinked ? "Linked" : isConfigured ? "Configured" : (channelAccounts[ch.id]?.length > 0 ? "Active" : "Not linked")}
                   </span>
                 </div>
               );
