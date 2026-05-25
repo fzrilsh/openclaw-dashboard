@@ -107,10 +107,6 @@ export function Board() {
     if (!task || task.columnId === columnId) return;
     dragTaskRef.current = null;
     await handleUpdate(task.id, { columnId });
-    // Auto-execute when moving to In Progress
-    if (columnId === "in_progress" && task.assigneeName) {
-      await handleExecute(task.id);
-    }
   };
 
   // Filter tasks

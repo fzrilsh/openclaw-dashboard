@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { promises as fs } from "fs";
+import { execSync } from "child_process";
 import path from "path";
 
 const DATA_FILE = path.join(process.cwd(), "data", "kanban.json");
@@ -64,9 +65,41 @@ export async function PATCH(
     if (body.acceptanceCriteria !== undefined) { task.acceptanceCriteria = body.acceptanceCriteria; }
     if (body.priority !== undefined) { task.priority = body.priority; changes.push("priority"); }
     if (body.columnId !== undefined && body.columnId !== task.columnId) {
+      const oldColumn = task.columnId;
       task.columnId = body.columnId;
       task.order = board.tasks.filter((t: any) => t.columnId === body.columnId).length;
       changes.push(`status to ${body.columnId}`);
+
+      // Auto-execute when moving to "in_progress"
+      if (body.columnId === "in_progress" && task.assigneeName) {
+        let prompt = `## Task: ${task.title}\n\n`;
+        if (task.description) prompt += `${task.description}\n\n`;
+        if (task.acceptanceCriteria) prompt += `### Acceptance Criteria\n${task.acceptanceCriteria}\n\n`;
+        prompt += `Priority: ${task.priority}\n`;
+        if (task.dueDate) prompt += `Due: ${task.dueDate}\n`;
+
+        try {
+          const cmd = `openclaw agent --agent "${task.assigneeName}" --message ${JSON.stringify(prompt)} --json 2>/dev/null`;
+          const output = execSync(cmd, { encoding: "utf-8", timeout: 120000 });
+          let agentResponse = "";
+          try {
+            const parsed = JSON.parse(output);
+            if (parsed.payloads && parsed.payloads.length > 0) {
+              agentResponse = parsed.payloads.map((p: any) => p.text).filter(Boolean).join("\n");
+            } else if (parsed.text) {
+              agentResponse = parsed.text;
+            }
+          } catch {
+            agentResponse = output.trim();
+          }
+          task.lastResult = agentResponse;
+          addActivity(task, "executed", `Executed by agent "${task.assigneeName}"`);
+          task.columnId = "in_review";
+          changes.push("auto-executed → in_review");
+        } catch (execErr) {
+          addActivity(task, "execution_failed", `Execution failed: ${execErr instanceof Error ? execErr.message : "Unknown error"}`);
+        }
+      }
     }
     if (body.order !== undefined) { task.order = body.order; }
     if (body.assignee !== undefined) { task.assignee = body.assignee; changes.push("assignee"); }
