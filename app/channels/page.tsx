@@ -130,7 +130,16 @@ export default function OpenClawChannelsPage() {
     setLinkingChannelId(null);
   };
 
-  const linkedCount = channelMeta.filter((c) => channelDetails[c.id]?.linked).length;
+  const isChannelActive = (detail: ChannelDetail | undefined) => {
+    return !!(
+      detail?.linked ||
+      detail?.configured ||
+      detail?.connected ||
+      detail?.running ||
+      detail?.authAgeMs
+    );
+  };
+  const linkedCount = channelMeta.filter((c) => isChannelActive(channelDetails[c.id])).length;
   const showQRModal = qrState.step !== "idle" && linkingChannelId;
 
   return (
@@ -197,8 +206,8 @@ export default function OpenClawChannelsPage() {
         <div className="space-y-2">
           {channelMeta.map((ch) => {
             const detail = channelDetails[ch.id];
-            const isLinked = detail?.linked ?? false;
-            const isConfigured = detail?.configured ?? false;
+            const isLinked = !!(detail?.linked || detail?.connected || detail?.running || detail?.authAgeMs);
+            const isConfigured = !!(detail?.configured);
             const hasError = !!detail?.lastError;
             const selfNum = detail?.self?.e164;
             const authAge = detail?.authAgeMs ? formatAge(detail.authAgeMs) : null;
