@@ -32,19 +32,29 @@ export default function OpenClawLogsPage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const autoScrollRef = useRef(true);
 
+  // Helper to extract lines from response
+  const extractLines = useCallback((result: unknown): string[] => {
+    if (Array.isArray(result)) return result;
+    if (result && typeof result === "object" && "lines" in result) {
+      const r = result as { lines: string[] };
+      return Array.isArray(r.lines) ? r.lines : [];
+    }
+    return [];
+  }, []);
+
   // Initial log load
   const loadLogs = useCallback(async () => {
     if (!isConnected) return;
     setLoading(true);
     try {
       const result = await rpc("logs.tail", { lines: 200 });
-      setLogs(Array.isArray(result) ? result : []);
+      setLogs(extractLines(result));
     } catch (err) {
       console.error("Failed to load logs:", err);
     } finally {
       setLoading(false);
     }
-  }, [rpc, isConnected]);
+  }, [rpc, isConnected, extractLines]);
 
   useEffect(() => {
     if (isConnected) loadLogs();
@@ -58,10 +68,11 @@ export default function OpenClawLogsPage() {
     const interval = setInterval(async () => {
       try {
         const result = await rpc("logs.tail", { lines: 50 });
-        if (Array.isArray(result) && result.length > 0) {
+        const newLines = extractLines(result);
+        if (newLines.length > 0) {
           setLogs((prev) => {
             // Deduplicate by keeping last 500 lines
-            const combined = [...prev, ...result];
+            const combined = [...prev, ...newLines];
             const unique = [...new Set(combined)];
             return unique.slice(-500);
           });

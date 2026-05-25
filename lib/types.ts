@@ -449,7 +449,7 @@ export type RPCMethodMap = {
   "sessions.compact": [{ key: string }, void];
 
   // Models
-  "models.list": [void, ModelChoice[]];
+  "models.list": [void, { models: ModelChoice[] }];
 
   // TTS
   "tts.status": [void, TTSStatus];
@@ -500,7 +500,7 @@ export type RPCMethodMap = {
   "config.schema": [void, unknown];
 
   // Logs
-  "logs.tail": [{ lines?: number; filter?: string } | void, string[]];
+  "logs.tail": [{ lines?: number; filter?: string; cursor?: string; maxBytes?: number } | void, { file?: string; lines: string[]; cursor?: string }];
 
   // Talk mode
   "talk.config": [void, unknown];
